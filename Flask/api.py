@@ -1,10 +1,10 @@
 import flask
-from flask import redirect, url_for, request, jsonify
+from flask import redirect, url_for, request, jsonify, render_template
 import sqlite3
 import json
 
 
-app = flask.Flask(__name__)
+app = flask.Flask(__name__, template_folder='./')
 app.config["DEBUG"] = True
 
 
@@ -18,8 +18,7 @@ def dict_factory(cursor, row):
 
 @app.route('/', methods=['GET'])
 def home():
-    return "<h1>Cours Python</h1><p>Ce site est un exemple d'API .</p>"
-
+    return render_template('index.html')
 
 @app.route('/books/all', methods=['GET'])
 def api_all():
@@ -30,8 +29,8 @@ def api_all():
     cur = conn.cursor()
 
     all_books = cur.execute('SELECT * FROM books;').fetchall()
-
-    return jsonify(all_books)
+    #return jsonify(all_books)
+    return render_template("index.html",object = all_books)
 
 @app.route('/books', methods=['POST'])
 def add_books():
@@ -43,9 +42,9 @@ def add_books():
     #book = (222, 2021, 'kevin ansard', 'cours Python', 'Bonne chance')
     cur = conn.cursor()
 
-    body = request.get_json()
+    bodyjson = request.get_json() #get body from post request
 
-    data = json.loads(json.dumps(body))
+    bodydict = json.loads(json.dumps(body)) #get body into dict
     testb = (data['id'], data['published'], data['author'], data['title'], data['first_sentence'])
 
     #print(data['author'])
